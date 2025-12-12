@@ -1,0 +1,8 @@
+-Wall
+-Werror
+-Wextra
+-std=c++2b
+-I
+inc
+-I
+libs/glfw/include/GLFW
