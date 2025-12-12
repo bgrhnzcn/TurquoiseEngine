@@ -2,7 +2,10 @@
 -Werror
 -Wextra
 -std=c++2b
+-g
 -I
 inc
 -I
 libs/glfw/include/GLFW
+-I
+libs/glad
