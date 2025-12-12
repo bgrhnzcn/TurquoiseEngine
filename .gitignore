@@ -31,7 +31,7 @@
 *.out
 *.app
 
-libs/
+libs/*
 !libs/glad
 obj/
 scop
