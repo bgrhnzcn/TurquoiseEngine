@@ -6,6 +6,6 @@
 -I
 inc
 -I
-libs/glfw/include/GLFW
+libs/glfw/include
 -I
 libs/glad

@@ -28,6 +28,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 all: $(NAME)
 
+################################################################################
+#                                                                              #
+#                                GLFW3 / GLAD                                  #
+#                                                                              #
+################################################################################
+
 GLAD_DIR = $(LIB_DIR)/glad
 
 GLAD_INC = $(GLAD_DIR)
@@ -40,34 +46,25 @@ GLAD_LINK = -L $(GLAD_DIR) -lglad
 
 GLAD = $(GLAD_DIR)/libglad.a
 
-$(GLAD): $(GLAD_OBJ)
-	$(AR) rcs $(GLAD) $(GLAD_OBJ)
-
-%.o: %.c
-	$(CC) $(CC_FLAGS) -I $(GLAD_INC) -c $< -o $@
-
-$(GLFW_DIR):
-	git clone https://github.com/glfw/glfw.git $(GLFW_DIR)
-
-################################################################################
-#                                                                              #
-#                                GLFW3 / GLAD                                  #
-#                                                                              #
-################################################################################
-
 GLFW_DIR = $(LIB_DIR)/glfw
 
-GLFW_INC = $(GLFW_DIR)/include/GLFW
+GLFW_INC = $(GLFW_DIR)/include
 
 GLFW_LINK = -L $(GLFW_DIR)/src -lglfw3 -lGL -ldl -lpthread -lX11 -lXrandr
 
 GLFW = $(GLFW_DIR)/src/libglfw3.a
 
+$(GLAD): $(GLAD_OBJ)
+	$(AR) rcs $@ $<
+
+%.o: %.c
+	$(CC) $(CC_FLAGS) -I $(GLAD_INC) -c $< -o $@
+
 $(GLFW): $(GLFW_DIR)
-	cd $(GLFW_DIR) && cmake . && make
+	cd $< && cmake . && make
 
 $(GLFW_DIR):
-	git clone https://github.com/glfw/glfw.git $(GLFW_DIR)
+	git clone https://github.com/glfw/glfw.git $@
 
 $(NAME): $(GLFW) $(GLAD) $(OBJS)
 	$(CXX) $(CXX_FLAGS) $(OBJS) $(GLAD_LINK) $(GLFW_LINK) -o $@
