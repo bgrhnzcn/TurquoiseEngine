@@ -75,11 +75,51 @@ int main()
 
 	glClearColor(0.34, 0.34, 0.34, 1);
 
-	// A simple triangle centered on screen
-	Vertex vertices[3] = {
-		{{-0.5f, -0.5f, 0.0f}, {-1, 1, 0}, {}}, // Bottom Left
-		{{0.5f, -0.5f, 0.0f}, {1, 1, 0}, {}},	// Bottom Right
-		{{0.0f, 0.5f, 0.0f}, {-1, -1, 0}, {}}	// Top Center
+	Vertex vertices[] = {
+		// FRONT FACE (Normal: 0, 0, 1)
+		{ {-0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 0.0f} }, // Bottom-Left
+		{ { 0.5f, -0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 0.0f} }, // Bottom-Right
+		{ { 0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {1.0f, 1.0f} }, // Top-Right
+		{ {-0.5f,  0.5f,  0.5f}, { 0.0f,  0.0f,  1.0f}, {0.0f, 1.0f} }, // Top-Left
+
+		// BACK FACE (Normal: 0, 0, -1)
+		{ { 0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 0.0f} }, // Bottom-Left
+		{ {-0.5f, -0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 0.0f} }, // Bottom-Right
+		{ {-0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {1.0f, 1.0f} }, // Top-Right
+		{ { 0.5f,  0.5f, -0.5f}, { 0.0f,  0.0f, -1.0f}, {0.0f, 1.0f} }, // Top-Left
+
+		// LEFT FACE (Normal: -1, 0, 0)
+		{ {-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f} },
+		{ {-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f} },
+		{ {-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f} },
+		{ {-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f} },
+
+		// RIGHT FACE (Normal: 1, 0, 0)
+		{ { 0.5f, -0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 0.0f} },
+		{ { 0.5f, -0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 0.0f} },
+		{ { 0.5f,  0.5f, -0.5f}, { 1.0f,  0.0f,  0.0f}, {1.0f, 1.0f} },
+		{ { 0.5f,  0.5f,  0.5f}, { 1.0f,  0.0f,  0.0f}, {0.0f, 1.0f} },
+
+		// TOP FACE (Normal: 0, 1, 0)
+		{ {-0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 0.0f} },
+		{ { 0.5f,  0.5f,  0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 0.0f} },
+		{ { 0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {1.0f, 1.0f} },
+		{ {-0.5f,  0.5f, -0.5f}, { 0.0f,  1.0f,  0.0f}, {0.0f, 1.0f} },
+
+		// BOTTOM FACE (Normal: 0, -1, 0)
+		{ {-0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 0.0f} },
+		{ { 0.5f, -0.5f, -0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 0.0f} },
+		{ { 0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {1.0f, 1.0f} },
+		{ {-0.5f, -0.5f,  0.5f}, { 0.0f, -1.0f,  0.0f}, {0.0f, 1.0f} }
+	};
+
+	unsigned int indices[] = {
+		0, 1, 2,  2, 3, 0,       // Front
+		4, 5, 6,  6, 7, 4,       // Back
+		8, 9, 10, 10, 11, 8,     // Left
+		12, 13, 14, 14, 15, 12,  // Right
+		16, 17, 18, 18, 19, 16,  // Top
+		20, 21, 22, 22, 23, 20   // Bottom
 	};
 
 	std::cout << "vertex size: " << sizeof(Vertex) << std::endl;
@@ -94,9 +134,13 @@ int main()
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(Vertex), &vertices,
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices,
 				 GL_STATIC_DRAW);
+
+	GLuint ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
 	glEnableVertexAttribArray(0);
@@ -117,7 +161,7 @@ int main()
 		"layout (location = 1) in vec3 aNor;\n"
 		"void main()\n"
 		"{\n"
-		"   gl_Position = vec4(aNor.x, aNor.y, aNor.z, 1.0);\n"
+		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 		"}\0";
 
 	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
@@ -133,19 +177,20 @@ int main()
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShader);
+
 	unsigned int shader = glCreateProgram();
 	glAttachShader(shader, vertexShader);
 	glAttachShader(shader, fragmentShader);
 	glLinkProgram(shader);
 	glUseProgram(shader);
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(win))
 	{
-
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shader);
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / 4, GL_UNSIGNED_INT, 0);
 		glfwPollEvents();
 		glfwSwapBuffers(win);
 	}

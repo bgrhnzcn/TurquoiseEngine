@@ -4,7 +4,7 @@ SHELL = /bin/bash
 
 CXX = c++
 
-CXX_FLAGS = -Wall -Werror -Wextra -std=c++2b -g
+CXX_FLAGS = -Wall -Werror -Wextra -std=c++2b -MD -g
 
 CC = cc
 
@@ -18,15 +18,27 @@ LIB_DIR = libs
 
 INC_DIR = inc
 
+DEP_DIR = deps
+
 SRCS = $(shell find $(SRC_DIR) -type f -name "*.cpp")
 
 OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(dir $@)
-	$(CXX) $(CXX_FLAGS) -I $(INC_DIR) -I $(GLFW_INC) -I $(GLAD_INC) -c $< -o $@
+DEPS = $(OBJS:$(OBJ_DIR)/%.o=$(DEP_DIR)/%.d)
 
 all: $(NAME)
+
+################################################################################
+#                                                                              #
+#                                Object Rule                                   #
+#                                                                              #
+################################################################################
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	mkdir -p $(dir $@)
+	mkdir -p $(dir $(DEP_DIR)/$*.d)
+	$(CXX) $(CXX_FLAGS) -I $(INC_DIR) -I $(GLFW_INC) -I $(GLAD_INC) \
+		-MMD -MP -MF $(DEP_DIR)/$*.d -c $< -o $@
 
 ################################################################################
 #                                                                              #
@@ -70,7 +82,7 @@ $(NAME): $(GLFW) $(GLAD) $(OBJS)
 	$(CXX) $(CXX_FLAGS) $(OBJS) $(GLAD_LINK) $(GLFW_LINK) -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(GLAD_OBJ)
+	rm -rf $(OBJ_DIR) $(DEP_DIR) $(GLAD_OBJ)
 
 fclean: clean
 	rm -f $(NAME) $(GLAD)
@@ -83,5 +95,7 @@ re: fclean all
 .ONESHELL: run
 run: all
 	./scop
+
+-include $(DEPS)
 
 .PHONY: all clean fclean re run
