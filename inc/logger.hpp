@@ -60,7 +60,7 @@ class Logger
 		std::string_view fileName = format.m_loc.file_name();
 		std::uint32_t lineNumber  = format.m_loc.line();
 
-		out << std::format("{} file: {}:{}: {}", label, fileName, lineNumber,
+		out << std::format("{} source: {}:{}: {}", label, fileName, lineNumber,
 						   formatedStr)
 			<< std::endl;
 	}

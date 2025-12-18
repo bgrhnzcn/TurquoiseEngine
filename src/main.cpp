@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cstddef>
-#include <iostream>
-#include <print>
 
 #include "logger.hpp"
 #include "shader.hpp"
@@ -32,7 +30,7 @@ void callback(GLFWwindow* win, int key, int scancode, int action, int mods)
 			glClearColor(1, 1, 1, 1);
 			break;
 		}
-	std::cout << "key pressed: " << key << std::endl;
+	Logger::info("Key Pressed: {}", key);
 }
 
 int main()
@@ -42,8 +40,7 @@ int main()
 
 	if (glfw == GLFW_FALSE)
 	{
-
-		std::cout << "GLFW init failed." << std::endl;
+		Logger::error("GLFW init failed.");
 		exit(1);
 	}
 
@@ -62,14 +59,14 @@ int main()
 
 	if (win == nullptr)
 	{
-		std::cerr << "Failed to create window." << std::endl;
+		Logger::error("Failed to create window.");
 		exit(1);
 	}
 
 	glfwMakeContextCurrent(win);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cerr << "Failed to load OpenGL functions." << std::endl;
+		Logger::error("Failed to load OpenGL functions.");
 		exit(1);
 	}
 
@@ -180,5 +177,6 @@ int main()
 		glfwSwapBuffers(win);
 	}
 	glfwTerminate();
+	Logger::error("Error.");
 	return 0;
 }
