@@ -2,8 +2,12 @@
 #include <GLFW/glfw3.h>
 #include <cstddef>
 #include <iostream>
+#include <print>
 
+#include "logger.hpp"
+#include "shader.hpp"
 #include "vertex.hpp"
+#include "mat4.hpp"
 
 void callback(GLFWwindow* win, int key, int scancode, int action, int mods)
 {
@@ -122,10 +126,10 @@ int main()
 		20, 21, 22, 22, 23, 20   // Bottom
 	};
 
-	std::cout << "vertex size: " << sizeof(Vertex) << std::endl;
-	std::cout << "pos: " << offsetof(Vertex, pos) << std::endl;
-	std::cout << "nor: " << offsetof(Vertex, nor) << std::endl;
-	std::cout << "tex: " << offsetof(Vertex, tex) << std::endl;
+	Logger::info("vertex size: {}", sizeof(Vertex));
+	Logger::info("pos: {}", offsetof(Vertex, pos));
+	Logger::info("nor: {}", offsetof(Vertex, nor));
+	Logger::info("tex: {}", offsetof(Vertex, tex));
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -153,42 +157,23 @@ int main()
 						  (GLvoid*)offsetof(Vertex, tex));
 	glEnableVertexAttribArray(2);
 
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	Logger::warning("{}", "test");
 
-	const char* vertexShaderSource =
-		"#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"layout (location = 1) in vec3 aNor;\n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"}\0";
+	Mat4 mtx = Mat4::identity();
+	mtx.print();
 
-	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-	glCompileShader(vertexShader);
+	Shader shader("assets/shader.glsl", "assets/fragment.glsl");
 
-	const char* fragmentShaderSource = "#version 330 core\n"
-									   "out vec4 FragColor;\n"
-									   "void main()\n"
-									   "{\n"
-									   "   FragColor = vec4(1, 0.5, 0.2, 1);\n"
-									   "}\0";
+	shader.use();
 
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-	glCompileShader(fragmentShader);
+	int transform = glGetUniformLocation(shader.getId(), "transforms");
 
-	unsigned int shader = glCreateProgram();
-	glAttachShader(shader, vertexShader);
-	glAttachShader(shader, fragmentShader);
-	glLinkProgram(shader);
-	glUseProgram(shader);
+	glUniformMatrix4fv(transform, 1, false, &mtx.col1.x);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(win))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(shader);
+		shader.use();
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / 4, GL_UNSIGNED_INT, 0);
 		glfwPollEvents();
