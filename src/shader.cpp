@@ -75,8 +75,39 @@ Shader::Shader(std::filesystem::path vertexPath,
 
 void Shader::use() { glUseProgram(m_Id); }
 
-unsigned int Shader::getId() const
+unsigned int Shader::getId() const { return m_Id; }
+
+void Shader::setUniformImpl(int location, const int& value) const
 {
-	return m_Id;
+	glUniform1i(location, value);
 }
 
+void Shader::setUniformImpl(int location, const float& value) const
+{
+	glUniform1f(location, value);
+}
+
+void Shader::setUniformImpl(int location, const bool& value) const
+{
+	glUniform1i(location, (int)value);
+}
+
+void Shader::setUniformImpl(int location, const Vec2& value) const
+{
+	glUniform2f(location, value.x, value.y);
+}
+
+void Shader::setUniformImpl(int location, const Vec3& value) const
+{
+	glUniform3f(location, value.x, value.y, value.z);
+}
+
+void Shader::setUniformImpl(int location, const Vec4& value) const
+{
+	glUniform4f(location, value.x, value.y, value.z, value.w);
+}
+
+void Shader::setUniformImpl(int location, const Mat4& value) const
+{
+	glUniformMatrix4fv(location, 1, GL_FALSE, &value.col1.x);
+}

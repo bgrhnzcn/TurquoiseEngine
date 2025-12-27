@@ -163,9 +163,7 @@ int main()
 
 	shader.use();
 
-	int transform = glGetUniformLocation(shader.getId(), "transforms");
-
-	glUniformMatrix4fv(transform, 1, false, &mtx.col1.x);
+	shader.setUniform("u_transform", mtx);
 
 	while (!glfwWindowShouldClose(win))
 	{
