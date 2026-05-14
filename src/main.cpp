@@ -1,11 +1,16 @@
+#include <cmath>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cstddef>
 
 #include "logger.hpp"
 #include "shader.hpp"
+#include "vec3.hpp"
+#include "vec4.hpp"
 #include "vertex.hpp"
 #include "mat4.hpp"
+
+Mat4 translate = Mat4::Translate({0,0,0});
 
 void callback(GLFWwindow* win, int key, int scancode, int action, int mods)
 {
@@ -17,17 +22,29 @@ void callback(GLFWwindow* win, int key, int scancode, int action, int mods)
 	if (action == GLFW_PRESS)
 		switch (key)
 		{
-		case GLFW_KEY_Q:
-			glClearColor(1, 0, 0, 1);
-			break;
 		case GLFW_KEY_W:
 			glClearColor(0, 1, 0, 1);
 			break;
-		case GLFW_KEY_E:
-			glClearColor(0, 0, 1, 1);
-			break;
 		case GLFW_KEY_R:
 			glClearColor(1, 1, 1, 1);
+			break;
+		case GLFW_KEY_UP:
+			translate = Mat4::Translate({translate.col4.x,translate.col4.y + 0.1f, translate.col4.z});
+			break;
+		case GLFW_KEY_DOWN:
+			translate = Mat4::Translate({translate.col4.x,translate.col4.y - 0.1f, translate.col4.z});
+			break;
+		case GLFW_KEY_LEFT:
+			translate = Mat4::Translate({translate.col4.x - 0.1f,translate.col4.y, translate.col4.z});
+			break;
+		case GLFW_KEY_RIGHT:
+			translate = Mat4::Translate({translate.col4.x + 0.1f,translate.col4.y, translate.col4.z});
+			break;
+		case GLFW_KEY_E:
+			translate = Mat4::Translate({translate.col4.x, translate.col4.y, translate.col4.z - 0.1f});
+			break;
+		case GLFW_KEY_Q:
+			translate = Mat4::Translate({translate.col4.x, translate.col4.y, translate.col4.z + 0.1f});
 			break;
 		}
 	Logger::info("Key Pressed: {}", key);
@@ -44,18 +61,10 @@ int main()
 		exit(1);
 	}
 
-	/*
-	GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-	if (monitor == nullptr) {
-	  std::cout << "GLFW can't find Window." << std::endl;
-	  exit(1);
-	}
-	*/
-
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_REPEAT, GLFW_FALSE);
 
-	GLFWwindow* win = glfwCreateWindow(800, 600, "scope", nullptr, nullptr);
+	GLFWwindow* win = glfwCreateWindow(800, 800, "scope", nullptr, nullptr);
 
 	if (win == nullptr)
 	{
@@ -70,7 +79,7 @@ int main()
 		exit(1);
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, 800, 800);
 
 	glfwSetKeyCallback(win, callback);
 
@@ -156,19 +165,28 @@ int main()
 
 	Logger::warning("{}", "test");
 
-	Mat4 mtx = Mat4::identity();
-	mtx.print();
-
 	Shader shader("assets/shader.glsl", "assets/fragment.glsl");
 
 	shader.use();
 
-	shader.setUniform("u_transform", mtx);
-
+	float time = 0;
 	while (!glfwWindowShouldClose(win))
 	{
+		time += 0.5;
 		glClear(GL_COLOR_BUFFER_BIT);
 		shader.use();
+
+		auto def = Mat4::identity();
+		Vec3 axis = Vec3(1, 1, 0);
+		float sin = (std::sin(time / 50) + 1) / 2;
+		auto scale = Mat4::Scale({1, 1, 1});
+		auto rotate = Mat4::Rotate(time, axis.normalize());
+		auto pers = Mat4::Perspective(M_PI / 2, 1, 0.1, 100);
+
+		auto transform = pers * (translate * (rotate * (scale * def)));
+		shader.setUniform("u_transform", transform);
+		shader.setUniform("u_color", Vec4(1 - sin));
+
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, sizeof(indices) / 4, GL_UNSIGNED_INT, 0);
 		glfwPollEvents();
