@@ -4,7 +4,7 @@ SHELL = /bin/bash
 
 CXX = c++
 
-CXX_FLAGS = -Wall -Werror -Wextra -std=c++2b -MD -g
+CXX_FLAGS = -Wall -Werror -Wextra -std=c++26 -freflection -MD -g
 
 CC = cc
 
@@ -82,13 +82,13 @@ $(NAME): $(GLFW) $(GLAD) $(OBJS)
 	$(CXX) $(CXX_FLAGS) $(OBJS) $(GLAD_LINK) $(GLFW_LINK) -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(DEP_DIR) $(GLAD_OBJ)
+	rm -rf $(OBJ_DIR) $(DEP_DIR)
 
 fclean: clean
-	rm -f $(NAME) $(GLAD)
+	rm -f $(NAME)
 
 hclean: fclean
-	rm -rf $(GLFW_DIR)
+	rm -rf $(GLFW_DIR) $(GLAD)
 
 re: fclean all
 
@@ -99,3 +99,6 @@ run: all
 -include $(DEPS)
 
 .PHONY: all clean fclean re run
+
+help:
+	@echo 

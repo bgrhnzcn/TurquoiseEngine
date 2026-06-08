@@ -4,6 +4,9 @@
 #include "vec3.hpp"
 #include "vec4.hpp"
 
+namespace lib
+{
+
 struct Mat4
 {
 	Vec4 col1;
@@ -15,17 +18,34 @@ struct Mat4
 	Mat4(float value);
 	Mat4(Vec4 col1, Vec4 col2, Vec4 col3, Vec4 col4);
 
-	static Mat4 identity();
+	static auto Identity() -> Mat4;
 
-	static Mat4 Scale(const Vec3& values);
-	static Mat4 Translate(const Vec3& values);
-	static Mat4 Rotate(float angle, const Vec3& axis);
-	static Mat4 Perspective(float fov, float aspectRatio, float near, float far);
+	static auto Scale(const Vec3& values) -> Mat4;
+	static auto Translate(const Vec3& values) -> Mat4;
+	static auto Rotate(float angle, const Vec3& axis) -> Mat4;
+	static auto Perspective(float fov, float aspectRatio, float near, float far)
+		-> Mat4;
 
-	Mat4 operator*(const Mat4& other);
-	float* getData();
-	Vec4 getRow(unsigned int index);
-	void print() const;
+	auto inverse() -> Mat4;
+	auto transpose() -> Mat4;
+
+	auto operator*(const Mat4& other) -> Mat4;
+	auto getRawData() -> float*;
+	auto getRow(unsigned int index) -> Vec4;
 };
 
+} // namespace lib
+template <>
+struct std::formatter< lib::Mat4 >
+{
+	constexpr auto parse(auto& ctx) { return ctx.begin(); }
+
+	auto format(const lib::Mat4& vec, auto& ctx) const
+	{
+		return std::format_to(
+			ctx.out(),
+			"{{\"Column1\":{},\"Column2\":{},\"Column3\":{},\"Column4\":{}}}",
+			vec.col1, vec.col2, vec.col3, vec.col4);
+	}
+};
 #endif // !MAT4_HPP

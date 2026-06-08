@@ -1,0 +1,10 @@
+CompileFlags:
+  Remove:
+    # Remove GCC dependency tracking flags that confuse Clangd
+    - "-MD"
+    - "-MMD"
+    - "-MF*"
+    - "-MT*"
+    - "-MP"
+    # Remove the reflection flag to stop the "unknown argument" error
+    - "-freflection"
