@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-#include "glad/glad.h"
+#include <glad/gl.h>
 #include "logger.hpp"
 #include "program.hpp"
 

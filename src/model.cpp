@@ -58,9 +58,6 @@ void Model::parseModel(std::string_view content)
 	std::vector< lib::Vec3 > positions;
 	std::vector< lib::Vec3 > normals;
 	std::vector< lib::Vec2 > textures;
-	std::vector< Vertex > meshVertices;
-	std::vector< std::uint32_t > meshIndices;
-	std::vector< Texture > meshTextures;
 
 	std::size_t pos = 0;
 	while (pos < content.size())

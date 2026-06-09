@@ -35,3 +35,4 @@ libs/*
 !libs/glad
 obj/
 scop
+build/

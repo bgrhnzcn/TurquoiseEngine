@@ -1,7 +1,6 @@
 #ifndef MESH_HPP
 #define MESH_HPP
 
-#include "shader.hpp"
 #include "texture.hpp"
 #include "vertex.hpp"
 
@@ -12,22 +11,19 @@ class Mesh
 {
   public:
 	Mesh();
+	Mesh(std::vector< Vertex >&& vertices,
+		 std::vector< std::uint32_t >&& indices,
+		 std::vector< Texture >&& textures);
 	Mesh(Mesh&&)				 = default;
 	Mesh(const Mesh&)			 = default;
 	Mesh& operator=(Mesh&&)		 = default;
 	Mesh& operator=(const Mesh&) = default;
 	~Mesh()						 = default;
 
-  public:
-	void Draw(const Shader& shader) const;
-	void setupMesh(const std::vector< Vertex >& vertices,
-				   const std::vector< std::uint32_t >& indices,
-				   const std::vector< Texture > textures);
-
   private:
-	std::vector< Vertex > m_vertices;
-	std::vector< std::uint32_t > m_indices;
-	std::vector< Texture > m_textures;
+	std::vector< Vertex > vertices_;
+	std::vector< std::uint32_t > indices_;
+	std::vector< Texture > textures_;
 };
 
 #endif // !MESH_HPP

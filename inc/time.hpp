@@ -11,16 +11,19 @@ class Time
 {
   private:
 	inline static std::chrono::time_point< std::chrono::steady_clock >
-		currTime_;
+		currTimePoint_;
 	inline static std::chrono::time_point< std::chrono::steady_clock >
-		prevTime_;
-	inline static std::chrono::duration< float > deltaTime_;
+		prevTimePoint_;
+	inline static std::chrono::duration< float > deltaTimeDuration_;
+
+  private:
+	inline static double currTime_			= 0;
+	inline static double deltaTime_			= 0;
 	inline static std::uint64_t frameCount_ = 0;
 
   public:
-	inline static const float& deltaTime = deltaTime_.count();
-	inline static const float& currTime	 = currTime_.time_since_epoch().count();
-	inline static const float& prevTime	 = prevTime_.time_since_epoch().count();
+	inline static const double& deltaTime		  = deltaTime_;
+	inline static const double& currTime			  = currTime_;
 	inline static const std::uint64_t& frameCount = frameCount_;
 
   public:

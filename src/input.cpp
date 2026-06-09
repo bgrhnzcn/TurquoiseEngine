@@ -1,4 +1,5 @@
 #include "input.hpp"
+#include "key_code.hpp"
 #include "key_event.hpp"
 #include "logger.hpp"
 
@@ -13,12 +14,50 @@ auto Input::inputCallback_(::GLFWwindow* win, int key, int scancode, int action,
 
 	const Logger& logger = Logger::getLogger("Inputs");
 
-	if (key >= 0 && key <= 127)
+	if (key >= 0 && key < 512)
 	{
 		if (action == GLFW_PRESS)
-			Input::currentKeyStates.at(key) = KeyState::PRESS;
+		{
+			auto code = KeyCode::fromKeycode(key);
+			if (code.has_value())
+				Input::currentKeyStates.at(key) = KeyState::PRESS;
+			else
+				logger.warning("Key Pressed: Unkown");
+		}
 		if (action == GLFW_RELEASE)
-			Input::currentKeyStates.at(key) = KeyState::RELEASE;
+		{
+			auto code = KeyCode::fromKeycode(key);
+			if (code.has_value())
+				Input::currentKeyStates.at(key) = KeyState::RELEASE;
+			else
+				logger.warning("Key Released: Unkown");
+		}
 	}
-	logger.debug("Key Pressed: {}", key);
+}
+
+auto Input::inputUpdate_() -> void
+{
+	previousKeyStates = currentKeyStates;
+}
+
+auto Input::keyPressed(KeyCode key) -> bool
+{
+	return (currentKeyStates.at(key) == KeyState::PRESS
+			&& previousKeyStates.at(key) == KeyState::RELEASE);
+}
+
+auto Input::keyReleased(KeyCode key) -> bool
+{
+	return (currentKeyStates.at(key) == KeyState::RELEASE
+			&& previousKeyStates.at(key) == KeyState::PRESS);
+}
+
+auto Input::keyDown(KeyCode key) -> bool
+{
+	return (currentKeyStates.at(key) == KeyState::PRESS);
+}
+
+auto Input::keyUp(KeyCode key) -> bool
+{
+	return (currentKeyStates.at(key) == KeyState::RELEASE);
 }

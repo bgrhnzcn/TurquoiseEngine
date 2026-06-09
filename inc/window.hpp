@@ -2,7 +2,7 @@
 #define WINDOW_HPP
 
 // clang-format off
-#include "glad/glad.h"
+#include <glad/gl.h>
 #include "GLFW/glfw3.h"
 // clang-format off
 #include <cstddef>

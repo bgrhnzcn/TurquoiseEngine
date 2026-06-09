@@ -5,9 +5,13 @@ namespace lib
 {
 auto lib::Time::tick() -> void
 {
-	prevTime_  = currTime_;
-	currTime_  = std::chrono::steady_clock::now();
-	deltaTime_ = currTime_ - prevTime_;
+	prevTimePoint_	   = currTimePoint_;
+	currTimePoint_	   = std::chrono::steady_clock::now();
+	deltaTimeDuration_ = currTimePoint_ - prevTimePoint_;
+	currTime_		   = currTimePoint_.time_since_epoch().count();
+	deltaTime_		   = deltaTimeDuration_.count();
+	if (deltaTime > 0.33)
+		deltaTime_ = 0.33;
 	frameCount_++;
 }
 } // namespace lib

@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include "window.hpp"
+#include <memory>
 
 class Engine
 {
@@ -15,8 +16,8 @@ class Engine
 	virtual auto update() -> void = 0;
 
   private:
-	bool isShutdown_;
-	Window window_;
+	bool isShutdown_ = false;
+	std::unique_ptr<Window> window_;
 };
 
 #endif // !ENGINE_HPP

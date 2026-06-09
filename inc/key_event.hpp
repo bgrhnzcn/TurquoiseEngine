@@ -3,8 +3,8 @@
 
 enum KeyState
 {
-	PRESS,
 	RELEASE,
+	PRESS,
 };
 
 #endif // !KEY_STATE_HPP

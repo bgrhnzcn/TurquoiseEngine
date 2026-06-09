@@ -1,7 +1,7 @@
 #ifndef PROGRAM_HPP
 #define PROGRAM_HPP
 
-#include "glad/glad.h"
+#include <glad/gl.h>
 #include "mat4.hpp"
 #include "vec2.hpp"
 #include "vec3.hpp"

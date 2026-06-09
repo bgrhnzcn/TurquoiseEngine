@@ -32,7 +32,7 @@ Window::Window(std::size_t width, std::size_t height, const std::string& title)
 	::glfwMakeContextCurrent(handler_);
 	::glfwSetKeyCallback(handler_, Input::inputCallback_);
 
-	if (!::gladLoadGLLoader((::GLADloadproc)::glfwGetProcAddress))
+	if (!::gladLoadGL((::GLADloadfunc)::glfwGetProcAddress))
 	{
 		log.error("Failed to load OpenGL functions.");
 		exit(1);

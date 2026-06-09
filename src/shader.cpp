@@ -1,5 +1,5 @@
 #include "shader.hpp"
-#include "glad/glad.h"
+#include <glad/gl.h>
 #include "logger.hpp"
 #include <exception>
 #include <filesystem>
