@@ -19,14 +19,24 @@ include(FetchContent)
 
 # Fetch GLFW
 FetchContent_Declare(
-				glfw
-				GIT_REPOSITORY https://github.com/glfw/glfw.git
-				GIT_TAG        3.4
+	glfw
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
+	GIT_TAG        3.4
 )
 set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
 set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "")
 set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(glfw)
+
+# Fetch Assimp
+FetchContent_Declare(
+	assimp
+	GIT_REPOSITORY https://github.com/assimp/assimp.git
+	GIT_TAG v6.0.5
+)
+set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE INTERNAL "")
+FetchContent_MakeAvailable(assimp)
 
 # Create a GLAD library from single header one.
 add_library(glad STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/glad_impl.c)
@@ -39,27 +49,41 @@ target_include_directories(
 # Find System OpenGL
 find_package(OpenGL REQUIRED)
 
-file(CREATE_LINK
-	${CMAKE_CURRENT_SOURCE_DIR}/assets
-	${CMAKE_BINARY_DIR}/assets
-	SYMBOLIC
-	COPY_ON_ERROR
-)
+if (NOT EXISTS "${CMAKE_BINARY_DIR}/assets" AND
+	NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/assets")
+	file(CREATE_LINK
+		${CMAKE_CURRENT_SOURCE_DIR}/assets
+		${CMAKE_BINARY_DIR}/assets
+		SYMBOLIC
+		COPY_ON_ERROR
+	)
+endif()
 
 # 4. Manually Define Source Files (.cpp only)
 set(SOURCES
-	src/engine.cpp
-	src/input.cpp
-	src/key_code.cpp
 	src/main.cpp
-	src/mat4.cpp
-	src/mesh.cpp
-	src/model.cpp
-	src/program.cpp
-	src/shader.cpp
-	src/test_engine.cpp
-	src/time.cpp
-	src/window.cpp
+	# Core
+	src/core/engine.cpp
+	src/core/window.cpp
+	src/core/test_engine.cpp
+	# Core/Input
+	src/core/input/input.cpp
+	src/core/input/key_code.cpp
+	# Core/Math
+	src/core/math/mat4.cpp
+	# Core/Util
+	src/core/util/time.cpp
+	src/core/util/logger.cpp
+	# Core/Asset
+	src/core/asset/mesh.cpp
+	src/core/asset/mesh_data.cpp
+	src/core/asset/model.cpp
+	src/core/asset/model_loader.cpp
+	# Core/Resources
+
+	# Core/Render
+	src/core/render/program.cpp
+	src/core/render/shader.cpp
 )
 
 # 5. Define the Executable Target using ${PROJECT_NAME}
@@ -84,6 +108,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 # 8. Link Dependencies using ${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
+	assimp
 	glad
 	OpenGL::GL
 )
