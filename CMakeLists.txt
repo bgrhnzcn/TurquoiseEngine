@@ -38,6 +38,26 @@ set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
 set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE INTERNAL "")
 FetchContent_MakeAvailable(assimp)
 
+
+add_library(imgui STATIC
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui_demo.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui_draw.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui_tables.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui_widgets.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/imgui_widgets.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends/imgui_impl_glfw.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/backends/imgui_impl_opengl3.cpp
+)
+
+target_link_libraries(imgui PUBLIC glfw)
+
+target_include_directories(
+	imgui
+	PUBLIC
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui
+)
+
 # Create a GLAD library from single header one.
 add_library(glad STATIC ${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/glad_impl.c)
 target_include_directories(
@@ -64,7 +84,7 @@ set(SOURCES
 	src/main.cpp
 	# Core
 	src/core/engine.cpp
-	src/core/window.cpp
+src/core/window.cpp
 	src/core/test_engine.cpp
 	# Core/Input
 	src/core/input/input.cpp
@@ -109,6 +129,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	glfw
 	assimp
+	imgui
 	glad
 	OpenGL::GL
 )

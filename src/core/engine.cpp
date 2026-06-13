@@ -7,6 +7,9 @@
 #include "core/util/logger.hpp"
 #include "core/util/time.hpp"
 #include "core/window.hpp"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
 #include <memory>
 
 namespace trq
@@ -22,6 +25,13 @@ auto Engine::init() -> void
 	window_ = std::make_unique< Window >(800u, 600u, "GameTitle");
 
 	logger.info("Window creation completed successfully!");
+
+	// IMGUI
+	IMGUI_CHECKVERSION();
+	imgui_ = ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(window_->nativeHandler(), true);
+	ImGui_ImplOpenGL3_Init();
+	// IMGUI
 
 	std::vector< trq::MeshData > meshes =
 		trq::ModelLoader::loadModel("assets/TestModels.fbx");
@@ -55,12 +65,29 @@ auto Engine::run() -> void
 
 	auto& storage = getRegistry().get< trq::MeshStorage >();
 
+	Vec4 bgColor;
 	while (!window_->shouldClose())
 	{
+		::glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
+		::glClear(GL_COLOR_BUFFER_BIT);
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::Begin("TestWindow");
+
+		ImGui::Text("Background Color:");
+		ImGui::ColorPicker4("Color", reinterpret_cast< float* >(&bgColor));
+
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		// TODO: Create renderer and move render specific (OpenGL or Vulkan)
 		// codes to there.
 		Time::tick();
-		::glClear(GL_COLOR_BUFFER_BIT);
 
 		auto def	= trq::Mat4::Identity();
 		auto axis	= trq::Vec3(1, 1, 0);
@@ -91,6 +118,9 @@ auto Engine::run() -> void
 auto Engine::shutdown() -> void
 {
 	isShutdown_ = true;
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext(imgui_);
 	window_->setClose();
 }
 

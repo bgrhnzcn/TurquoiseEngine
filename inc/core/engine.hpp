@@ -4,6 +4,7 @@
 #include "core/resources/storage_registry.hpp"
 #include "window.hpp"
 #include <memory>
+#include <imgui.h>
 
 namespace trq
 {
@@ -23,6 +24,7 @@ class Engine
   private:
 	bool isShutdown_ = false;
 	std::unique_ptr< Window > window_;
+	ImGuiContext* imgui_;
 	StorageRegistry storageRegistry_;
 };
 
