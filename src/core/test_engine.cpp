@@ -9,7 +9,8 @@ namespace trq
 
 auto TestEngine::update() -> void
 {
-	const ktp::Logger& log = ktp::Logger::getLogger();
+	ktp::Logger& log =
+		ktp::Logger::getLogger("Engine").setLogLevel(ktp::Logger::ERROR);
 	if (Input::keyPressed(KeyCode::KEY_Q))
 		log.info("KeyPress event worked correctly.");
 

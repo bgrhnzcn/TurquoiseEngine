@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "core/render/vertex.hpp"
+#include "core/resources/handle.hpp"
+#include "core/resources/resource_pool.hpp"
 
 namespace trq
 {
@@ -25,6 +27,9 @@ class MeshData
 	std::vector< Vertex > vertices_;
 	std::vector< std::uint32_t > indices_;
 };
+
+using MeshDataHandle  = Handle< MeshData >;
+using MeshDataStorage = trq::ResourcePool< trq::MeshData, 0xFFFFFFFF >;
 
 } // namespace trq
 

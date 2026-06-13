@@ -20,7 +20,7 @@ Program::Program(::GLuint vertexHandler, ::GLuint fragmentHandler,
 {
 	const Logger& log = Logger::getLogger("Shader");
 
-	handler_ = glCreateProgram();
+	handler_ = ::glCreateProgram();
 
 	if (handler_ == 0)
 	{

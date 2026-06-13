@@ -25,13 +25,13 @@ class Program
 
   public:
 	template < typename T >
-	int setUniform(std::string name, const T& value)
+	int setUniform(const std::string& name, const T& value)
 	{
 		int uniformLocation = 0;
 		if (!uniformCache_.contains(name))
 		{
 			uniformLocation =
-				glGetUniformLocation(this->handler_, name.c_str());
+				::glGetUniformLocation(this->handler_, name.c_str());
 			if (uniformLocation == -1)
 				return -1;
 			uniformCache_.insert_or_assign(name, uniformLocation);

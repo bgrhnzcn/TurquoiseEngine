@@ -143,7 +143,7 @@ class Logger
 
   public: // Static Functions
 	static const Logger& getLogger();
-	static const Logger& getLogger(std::string_view name);
+	static Logger& getLogger(std::string_view name);
 	static void setGlobalLogLevel(LogType level);
 
   private: // Static Variables
@@ -221,7 +221,7 @@ auto Logger::log(LogType type, const LogEntry& format, Args&&... args) const
 	}
 	else
 	{
-		if (type < m_logLevel && type < s_logLevel)
+		if (type < m_logLevel || type < s_logLevel)
 			return;
 
 		std::string_view label;
@@ -260,7 +260,9 @@ auto Logger::log(LogType type, const LogEntry& format, Args&&... args) const
 
 #ifdef KATIP_IMPLEMENTATION
 
-Logger::Logger(std::string_view name) : m_name(name), m_logLevel(INFO) {}
+Logger::Logger(std::string_view name) : m_name(name), m_logLevel(INFO)
+{
+}
 
 Logger::LoggerContext::LoggerContext()
 {
@@ -275,9 +277,12 @@ Logger::LoggerContext::~LoggerContext()
 		loggerThread.join();
 }
 
-auto Logger::getLogger() -> const Logger& { return getLogger("Global"); }
+auto Logger::getLogger() -> const Logger&
+{
+	return getLogger("Global");
+}
 
-auto Logger::getLogger(std::string_view name) -> const Logger&
+auto Logger::getLogger(std::string_view name) -> Logger&
 {
 	if (!getLoggerMap().contains(name.data()))
 		getLoggerMap().emplace(name,
@@ -285,7 +290,10 @@ auto Logger::getLogger(std::string_view name) -> const Logger&
 	return (*getLoggerMap().at(name.data()));
 }
 
-auto Logger::setGlobalLogLevel(LogType level) -> void { s_logLevel = level; }
+auto Logger::setGlobalLogLevel(LogType level) -> void
+{
+	s_logLevel = level;
+}
 
 auto Logger::logHandler() -> void
 {

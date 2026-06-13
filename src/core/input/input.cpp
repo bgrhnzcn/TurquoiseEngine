@@ -15,7 +15,7 @@ auto Input::inputCallback_(::GLFWwindow* win, int key, int scancode, int action,
 	(void)scancode;
 	(void)mods;
 
-	const Logger& logger = Logger::getLogger("Inputs");
+	Logger& logger = Logger::getLogger("Inputs").setLogLevel(Logger::ERROR);
 
 	if (key >= 0 && key < 512)
 	{

@@ -1,11 +1,10 @@
 #ifndef STORAGE_REGISTRY_HPP
 #define STORAGE_REGISTRY_HPP
 
+#include "ipool.hpp"
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
-
-#include "core/resources/resource_pool.hpp"
 
 namespace trq
 {

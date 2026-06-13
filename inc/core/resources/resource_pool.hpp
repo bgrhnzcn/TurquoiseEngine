@@ -2,11 +2,10 @@
 #define RESOURCE_POOL_HPP
 
 #include <cstdint>
+#include <optional>
+#include <ranges>
 #include <vector>
 
-#include "core/asset/mesh.hpp"
-#include "core/asset/mesh_data.hpp"
-#include "core/asset/texture.hpp"
 #include "core/resources/handle.hpp"
 #include "core/resources/ipool.hpp"
 
@@ -21,8 +20,9 @@ class ResourcePool : public IPool
 	using HandleType = Handle< ResourceType, Invalid >;
 
   public:
-	auto get(HandleType handle) -> ResourceType*;
+	auto get(HandleType handle) -> std::optional< ResourceType& >;
 	auto insert(ResourceType&& entry) -> HandleType;
+	auto getAllHandles() -> std::vector< HandleType >;
 
 	ResourcePool();
 	ResourcePool(const ResourcePool& other)						   = delete;
@@ -47,10 +47,9 @@ class ResourcePool : public IPool
 	std::vector< std::uint32_t > freeIndeces_;
 };
 
-
 template < typename ResourceType, std::uint32_t Invalid,
 		   std::uint32_t InitialSize >
-ResourcePool<ResourceType, Invalid, InitialSize>::ResourcePool()
+ResourcePool< ResourceType, Invalid, InitialSize >::ResourcePool()
 {
 	buffer_.reserve(InitialSize);
 	freeIndeces_.reserve(InitialSize);
@@ -59,20 +58,20 @@ ResourcePool<ResourceType, Invalid, InitialSize>::ResourcePool()
 template < typename ResourceType, std::uint32_t Invalid,
 		   std::uint32_t InitialSize >
 auto ResourcePool< ResourceType, Invalid, InitialSize >::get(HandleType handle)
-	-> ResourceType*
+	-> std::optional< ResourceType& >
 {
 	if (!handle.isValid())
-		return nullptr;
+		return std::nullopt;
 
 	std::uint32_t index = handle.getIndex();
 
 	if (index >= buffer_.size())
-		return nullptr;
+		return std::nullopt;
 
 	if (!buffer_[index].active || buffer_[index].generation != handle.getGen())
-		return nullptr;
+		return std::nullopt;
 
-	return &buffer_[index].entry;
+	return buffer_[index].entry;
 }
 
 template < typename ResourceType, std::uint32_t Invalid,
@@ -93,15 +92,25 @@ auto ResourcePool< ResourceType, Invalid, InitialSize >::insert(
 		freeIndeces_.pop_back();
 	}
 
-	buffer_[index].entry  = entry;
+	buffer_[index].entry  = std::move(entry);
 	buffer_[index].active = true;
 
 	return HandleType(index, buffer_[index].generation);
 }
 
-using MeshStorage	  = trq::ResourcePool< trq::Mesh, 0xFFFFFFFF >;
-using MeshDataStorage = trq::ResourcePool< trq::MeshData, 0xFFFFFFFF >;
-using TextureStorage  = trq::ResourcePool< trq::Texture, 0xFFFFFFFF >;
+template < typename ResourceType, std::uint32_t Invalid,
+		   std::uint32_t InitialSize >
+auto ResourcePool< ResourceType, Invalid, InitialSize >::getAllHandles()
+	-> std::vector< HandleType >
+{
+	return std::views::iota(0u, buffer_.size())
+		   | std::views::filter([&](std::uint32_t index) -> bool
+								{ return buffer_[index].active; })
+		   | std::ranges::views::transform(
+			   [&](std::uint32_t index)
+			   { return HandleType(index, buffer_[index].generation); })
+		   | std::ranges::to< std::vector >();
+}
 
 } // namespace trq
 

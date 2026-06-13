@@ -3,7 +3,7 @@
 
 #include "core/asset/mesh.hpp"
 #include "core/render/shader.hpp"
-#include "texture.hpp"
+#include "core/asset/material.hpp"
 
 #include <vector>
 
