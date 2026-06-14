@@ -1,4 +1,5 @@
 #include "core/engine.hpp"
+#include "GLFW/glfw3.h"
 #include "core/asset/model_loader.hpp"
 #include "core/input/input.hpp"
 #include "core/math/math.hpp"
@@ -108,7 +109,6 @@ auto Engine::run() -> void
 			if (res.has_value())
 				res->draw();
 		}
-		this->update();
 		::glfwSwapBuffers(window_->nativeHandler());
 		Input::inputUpdate_();
 		::glfwPollEvents();
@@ -122,6 +122,7 @@ auto Engine::shutdown() -> void
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext(imgui_);
 	window_->setClose();
+	::glfwTerminate();
 }
 
 auto Engine::shouldShutdown() -> bool

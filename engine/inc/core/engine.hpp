@@ -3,8 +3,8 @@
 
 #include "core/resources/storage_registry.hpp"
 #include "window.hpp"
-#include <memory>
 #include <imgui.h>
+#include <memory>
 
 namespace trq
 {
@@ -12,19 +12,26 @@ namespace trq
 class Engine
 {
   public:
+	Engine() = default;
+	Engine(const Engine& other)					   = delete;
+	auto operator=(const Engine& other) -> Engine& = delete;
+
+  public:
 	auto init() -> void;
 	auto run() -> void;
 	auto shutdown() -> void;
-	auto shouldShutdown() -> bool;
-	auto getRegistry() -> StorageRegistry&;
 
-  protected:
-	virtual auto update() -> void = 0;
+	[[nodiscard]]
+	auto shouldShutdown() -> bool;
+	[[nodiscard]]
+	auto getRegistry() -> StorageRegistry&;
+	[[nodiscard]]
+	auto getWindow() -> Window&;
 
   private:
 	bool isShutdown_ = false;
 	std::unique_ptr< Window > window_;
-	ImGuiContext* imgui_;
+	ImGuiContext* imgui_ = nullptr;
 	StorageRegistry storageRegistry_;
 };
 
