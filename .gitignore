@@ -31,6 +31,8 @@
 *.out
 *.app
 
+
+.vs/
 libs/*
 !libs/glad
 obj/

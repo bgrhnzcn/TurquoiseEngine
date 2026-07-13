@@ -12,34 +12,38 @@
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 #include <memory>
+#include <numbers>
+#include <filesystem>
 
 namespace trq
 {
 
-auto Engine::init() -> void
+auto Engine::init(std::filesystem::path assetPath) -> void
 {
 	const ktp::Logger& logger = ktp::Logger::getLogger("Initialization");
 
-	auto& storage	  = storageRegistry_.get< trq::MeshDataStorage >();
-	auto& meshStorage = storageRegistry_.get< trq::MeshStorage >();
+	auto& storage	  = storageRegistry_.get< MeshDataStorage >();
+	auto& meshStorage = storageRegistry_.get< MeshStorage >();
 
 	window_ = std::make_unique< Window >(800u, 600u, "GameTitle");
 
 	logger.info("Window creation completed successfully!");
 
 	// IMGUI
-	IMGUI_CHECKVERSION();
+	::IMGUI_CHECKVERSION();
 	imgui_ = ImGui::CreateContext();
-	ImGui_ImplGlfw_InitForOpenGL(window_->nativeHandler(), true);
-	ImGui_ImplOpenGL3_Init();
+	::ImGui_ImplGlfw_InitForOpenGL(window_->nativeHandler(), true);
+	::ImGui_ImplOpenGL3_Init();
 	// IMGUI
 
-	std::vector< trq::MeshData > meshes =
-		trq::ModelLoader::loadModel("assets/TestModels.fbx");
+	logger.info("AssetPath: {}", assetPath.string());
+
+	std::vector< MeshData > meshes =
+		ModelLoader::loadModel(assetPath/"TestModels.fbx");
 
 	std::vector< MeshDataStorage::HandleType > dataHandles;
 
-	for (trq::MeshData& mesh : meshes)
+	for (MeshData& mesh : meshes)
 		dataHandles.push_back(storage.insert(std::move(mesh)));
 
 	for (auto handle : dataHandles)
@@ -54,11 +58,11 @@ auto Engine::init() -> void
 		logger.debug("Handle: {}", handle.getIndex());
 }
 
-auto Engine::run() -> void
+auto Engine::run(std::filesystem::path assetPath) -> void
 {
 	Shader simple_vert =
-		Shader::FromFile("assets/vertex.glsl", Shader::VERTEX, "simple_vert");
-	Shader simple_frag = Shader::FromFile("assets/fragment.glsl",
+		Shader::FromFile(assetPath.string() + "/vertex.glsl", Shader::VERTEX, "simple_vert");
+	Shader simple_frag = Shader::FromFile(assetPath.string() + "/fragment.glsl",
 										  Shader::FRAGMENT, "simple_frag");
 
 	Program shaderFill(simple_vert.nativeHandler(), simple_frag.nativeHandler(),
@@ -72,8 +76,8 @@ auto Engine::run() -> void
 		::glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
 		::glClear(GL_COLOR_BUFFER_BIT);
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
+		::ImGui_ImplOpenGL3_NewFrame();
+		::ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
 		ImGui::Begin("TestWindow");
@@ -84,18 +88,18 @@ auto Engine::run() -> void
 		ImGui::End();
 
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		// TODO: Create renderer and move render specific (OpenGL or Vulkan)
 		// codes to there.
 		Time::tick();
 
 		auto def	= trq::Mat4::Identity();
-		auto axis	= trq::Vec3(1, 1, 0);
+		auto axis	= trq::Vec3(1.f, 1.f, 0.f);
 		auto scale	= trq::Mat4::Scale({0.2f, 0.2f, 0.2f});
 		auto rotate = trq::Mat4::Rotate(trq::Time::frameCount,
 										trq::math::normalize(axis));
-		auto pers	= trq::Mat4::Perspective(std::numbers::pi / 2, 1, 0.1, 100);
+		auto pers	= trq::Mat4::Perspective(std::numbers::pi / 2.f, 1.f, 0.1f, 100.f);
 		auto translate = trq::Mat4::Identity();
 
 		auto model = (translate * (rotate * (scale * def)));
@@ -107,7 +111,7 @@ auto Engine::run() -> void
 		{
 			auto res = storage.get(handle);
 			if (res.has_value())
-				res->draw();
+				(*res)->draw();
 		}
 		::glfwSwapBuffers(window_->nativeHandler());
 		Input::inputUpdate_();
@@ -118,8 +122,8 @@ auto Engine::run() -> void
 auto Engine::shutdown() -> void
 {
 	isShutdown_ = true;
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
+	::ImGui_ImplOpenGL3_Shutdown();
+	::ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext(imgui_);
 	window_->setClose();
 	::glfwTerminate();

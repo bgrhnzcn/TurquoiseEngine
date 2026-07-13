@@ -20,7 +20,7 @@ class ResourcePool : public IPool
 	using HandleType = Handle< ResourceType, Invalid >;
 
   public:
-	auto get(HandleType handle) -> std::optional< ResourceType& >;
+	auto get(HandleType handle) -> std::optional< ResourceType* >;
 	auto insert(ResourceType&& entry) -> HandleType;
 	auto getAllHandles() -> std::vector< HandleType >;
 
@@ -58,7 +58,7 @@ ResourcePool< ResourceType, Invalid, InitialSize >::ResourcePool()
 template < typename ResourceType, std::uint32_t Invalid,
 		   std::uint32_t InitialSize >
 auto ResourcePool< ResourceType, Invalid, InitialSize >::get(HandleType handle)
-	-> std::optional< ResourceType& >
+	-> std::optional< ResourceType* >
 {
 	if (!handle.isValid())
 		return std::nullopt;
@@ -71,7 +71,7 @@ auto ResourcePool< ResourceType, Invalid, InitialSize >::get(HandleType handle)
 	if (!buffer_[index].active || buffer_[index].generation != handle.getGen())
 		return std::nullopt;
 
-	return buffer_[index].entry;
+	return &(buffer_[index].entry);
 }
 
 template < typename ResourceType, std::uint32_t Invalid,

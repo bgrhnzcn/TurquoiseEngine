@@ -1,7 +1,6 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
-#include <GL/glcorearb.h>
 #include <chrono>
 #include <cstdint>
 

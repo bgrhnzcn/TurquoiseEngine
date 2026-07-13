@@ -17,12 +17,12 @@ auto ModelLoader::loadModel(std::filesystem::path file)
 	Model model;
 	::Assimp::Importer importer;
 
-	const ::aiScene* scene = importer.ReadFile(file, ::aiProcess_Triangulate);
+	const ::aiScene* scene = importer.ReadFile(file.string(), ::aiProcess_Triangulate);
 
 	if (scene == nullptr)
 	{
 		logger.error("Loading model failed: {}. Returning empty mesh list.",
-					 file);
+					 file.string());
 		return std::vector< MeshData >();
 	}
 

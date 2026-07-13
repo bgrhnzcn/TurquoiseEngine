@@ -40,16 +40,17 @@ auto Shader::loadShaderFromFile(std::filesystem::path path) -> std::string
 {
 	const Logger& log = Logger::getLogger("Shader");
 	std::ifstream shaderStream;
-	std::size_t fileSize = std::filesystem::file_size(path);
 
-	std::string shaderSrc(fileSize, 0);
 	shaderStream.open(path);
 
 	if (!shaderStream.is_open())
 	{
-		log.error("Can't open shader file: {}", path.c_str());
-		return shaderSrc;
+		log.error("Can't open shader file: {}", path.string());
+		return "";
 	}
+
+	std::size_t fileSize = std::filesystem::file_size(path);
+	std::string shaderSrc(fileSize, 0);
 
 	shaderStream.read(shaderSrc.data(), fileSize);
 
@@ -64,7 +65,6 @@ auto Shader::createShader(const std::string& sourceCode) -> void
 	if (handler_ == 0)
 	{
 		log.error("Shader creation failed. Please check possible errors.");
-		std::terminate();
 	}
 
 	const char* source = sourceCode.c_str();
@@ -79,7 +79,9 @@ auto Shader::createShader(const std::string& sourceCode) -> void
 	if (!compileStatus)
 	{
 		::glGetShaderInfoLog(handler_, 512, NULL, compileLog);
+		::glDeleteShader(handler_);
 		log.error("Compiling shader: {} failed: {}", name_, compileLog);
+		handler_ = 0;
 	}
 }
 

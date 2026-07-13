@@ -3,7 +3,6 @@
 
 // clang-format off
 #include <glad/gl.h>
-#include <GL/glext.h>
 // clang-format on
 #include <filesystem>
 #include <string>

@@ -5,6 +5,7 @@
 #include "window.hpp"
 #include <imgui.h>
 #include <memory>
+#include <filesystem>
 
 namespace trq
 {
@@ -17,8 +18,8 @@ class Engine
 	auto operator=(const Engine& other) -> Engine& = delete;
 
   public:
-	auto init() -> void;
-	auto run() -> void;
+	auto init(std::filesystem::path assetPath) -> void;
+	auto run(std::filesystem::path assetPath) -> void;
 	auto shutdown() -> void;
 
 	[[nodiscard]]

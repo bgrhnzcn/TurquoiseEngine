@@ -34,7 +34,7 @@ class Mesh
 	std::uint32_t vao_;
 	std::uint32_t vbo_;
 	std::uint32_t ebo_;
-	std::uint32_t elemCount_;
+	std::size_t elemCount_;
 };
 
 using MeshHandle  = Handle< Mesh >;

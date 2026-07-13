@@ -54,16 +54,6 @@ target_include_directories(
 # Find System OpenGL
 find_package(OpenGL REQUIRED)
 
-if (NOT EXISTS "${CMAKE_BINARY_DIR}/assets" AND
-	NOT IS_SYMLINK "${CMAKE_BINARY_DIR}/assets")
-	file(CREATE_LINK
-		${CMAKE_CURRENT_SOURCE_DIR}/assets
-		${CMAKE_BINARY_DIR}/assets
-		SYMBOLIC
-		COPY_ON_ERROR
-	)
-endif()
-
 # 4. Manually Define Source Files (.cpp only)
 set(SOURCES
 	# Core
@@ -87,6 +77,7 @@ set(SOURCES
 	# Core/Render
 	src/core/render/program.cpp
 	src/core/render/shader.cpp
+	src/core/render/camera.cpp
 )
 
 # 5. Define the Executable Target using ${PROJECT_NAME}
@@ -100,11 +91,19 @@ target_include_directories(
 )
 
 # 7. Set Required Compiler Flags (Conditional -Werror)
-target_compile_options(engine PRIVATE
-	-Wall
-	-Wextra
-	$<$<CONFIG:Release>:-Werror>
-)
+if (MSVC)
+	target_compile_options(engine PRIVATE
+		/W4
+		$<$<CONFIG:Release>:/WX>
+		/std:c++latest
+	)
+else()
+	target_compile_options(engine PRIVATE
+		-Wall
+		-Wextra
+		$<$<CONFIG:Release>:-Werror>
+	)
+endif()
 
 target_compile_definitions(engine PRIVATE GLFW_INCLUDE_NONE)
 
