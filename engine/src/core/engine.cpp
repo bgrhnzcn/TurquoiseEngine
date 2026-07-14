@@ -3,6 +3,7 @@
 #include "core/asset/model_loader.hpp"
 #include "core/input/input.hpp"
 #include "core/math/math.hpp"
+#include "core/render/camera.hpp"
 #include "core/render/program.hpp"
 #include "core/render/shader.hpp"
 #include "core/util/logger.hpp"
@@ -10,10 +11,9 @@
 #include "core/window.hpp"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <filesystem>
 #include <imgui.h>
 #include <memory>
-#include <numbers>
-#include <filesystem>
 
 namespace trq
 {
@@ -39,7 +39,7 @@ auto Engine::init(std::filesystem::path assetPath) -> void
 	logger.info("AssetPath: {}", assetPath.string());
 
 	std::vector< MeshData > meshes =
-		ModelLoader::loadModel(assetPath/"TestModels.fbx");
+		ModelLoader::loadModel(assetPath / "TestModels.fbx");
 
 	std::vector< MeshDataStorage::HandleType > dataHandles;
 
@@ -60,8 +60,8 @@ auto Engine::init(std::filesystem::path assetPath) -> void
 
 auto Engine::run(std::filesystem::path assetPath) -> void
 {
-	Shader simple_vert =
-		Shader::FromFile(assetPath.string() + "/vertex.glsl", Shader::VERTEX, "simple_vert");
+	Shader simple_vert = Shader::FromFile(assetPath.string() + "/vertex.glsl",
+										  Shader::VERTEX, "simple_vert");
 	Shader simple_frag = Shader::FromFile(assetPath.string() + "/fragment.glsl",
 										  Shader::FRAGMENT, "simple_frag");
 
@@ -71,6 +71,8 @@ auto Engine::run(std::filesystem::path assetPath) -> void
 	auto& storage = getRegistry().get< trq::MeshStorage >();
 
 	Vec4 bgColor;
+
+	Camera camera;
 	while (!window_->shouldClose())
 	{
 		::glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
@@ -94,24 +96,25 @@ auto Engine::run(std::filesystem::path assetPath) -> void
 		// codes to there.
 		Time::tick();
 
-		auto def	= trq::Mat4::Identity();
-		auto axis	= trq::Vec3(1.f, 1.f, 0.f);
-		auto scale	= trq::Mat4::Scale({0.2f, 0.2f, 0.2f});
-		auto rotate = trq::Mat4::Rotate(trq::Time::frameCount,
-										trq::math::normalize(axis));
-		auto pers	= trq::Mat4::Perspective(std::numbers::pi / 2.f, 1.f, 0.1f, 100.f);
-		auto translate = trq::Mat4::Identity();
+		auto axis	   = trq::Vec3(1.f, 1.f, 0.f);
+		auto scale	   = trq::Mat4::Scale({0.2f, 0.2f, 0.2f});
+		auto rotate	   = trq::Mat4::Rotate(trq::Time::frameCount,
+										   trq::math::normalize(axis));
+		auto translate = trq::Mat4::Translate({0.f, 0.f, -10.f});
 
-		auto model = (translate * (rotate * (scale * def)));
+		auto model = (translate * (rotate * scale));
 		shaderFill.use();
 		shaderFill.setUniform("u_model", model);
-		shaderFill.setUniform("u_projection", pers);
+
+		camera.updateMatrices();
+		shaderFill.setUniform("u_projection",
+							Mat4::Perspective(90.f, 1.0f, 0.1f, 100.f));
 
 		for (auto handle : storage.getAllHandles())
 		{
 			auto res = storage.get(handle);
 			if (res.has_value())
-				(*res)->draw();
+				(*res)->draw(shaderFill);
 		}
 		::glfwSwapBuffers(window_->nativeHandler());
 		Input::inputUpdate_();

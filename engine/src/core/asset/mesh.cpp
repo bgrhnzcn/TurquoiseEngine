@@ -1,5 +1,7 @@
 #include "core/asset/mesh.hpp"
+#include "core/render/program.hpp"
 #include <glad/gl.h>
+
 namespace trq
 {
 
@@ -72,8 +74,9 @@ Mesh::Mesh(const MeshData& data)
 	::glBindVertexArray(0);
 }
 
-auto Mesh::draw() -> void
+auto Mesh::draw(Program program) -> void
 {
+	program.use();
 	::glBindVertexArray(vao_);
 	::glDrawElements(GL_TRIANGLES, elemCount_, GL_UNSIGNED_INT, nullptr);
 }

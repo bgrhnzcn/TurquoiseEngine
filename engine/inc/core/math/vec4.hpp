@@ -40,6 +40,7 @@ inline constexpr Vec4::Vec4(float x, float y, float z, float w)
 {
 }
 
+
 inline constexpr auto Vec4::operator[](int index) -> float&
 {
 	assert(index >= 0 && index < 4

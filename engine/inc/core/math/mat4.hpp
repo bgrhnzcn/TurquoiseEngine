@@ -30,6 +30,7 @@ struct Mat4
 	auto transpose() -> Mat4;
 
 	auto operator*(const Mat4& other) -> Mat4;
+	auto operator*(const Vec4& other) -> Vec4;
 	auto getRawData() -> float*;
 	auto getRow(unsigned int index) -> Vec4;
 };

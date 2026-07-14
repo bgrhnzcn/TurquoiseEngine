@@ -79,6 +79,22 @@ inline float norm(const Vec4 vec)
 	return std::sqrt(dot(vec, vec));
 }
 
+// Reduce
+inline constexpr auto reduce(const Vec2 vec) -> float
+{
+	return vec.x + vec.y;
+}
+
+inline constexpr auto reduce(const Vec3 vec) -> float
+{
+	return vec.x + vec.y + vec.z;
+}
+
+inline constexpr auto reduce(const Vec4 vec) -> float
+{
+	return vec.x + vec.y + vec.z + vec.w;
+}
+
 // Cross
 inline constexpr float cross(const Vec2 v1, const Vec2 v2)
 {

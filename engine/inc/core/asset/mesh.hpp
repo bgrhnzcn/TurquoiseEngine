@@ -2,6 +2,7 @@
 #define MESH_HPP
 
 #include "core/asset/mesh_data.hpp"
+#include "core/render/program.hpp"
 #include "core/resources/handle.hpp"
 #include "core/resources/resource_pool.hpp"
 #include <cstdint>
@@ -27,7 +28,7 @@ class Mesh
 	~Mesh();
 
   public:
-	auto draw() -> void;
+	auto draw(Program program) -> void;
 	auto drawWireframe() -> void;
 
   private:

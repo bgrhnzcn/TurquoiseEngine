@@ -113,13 +113,23 @@ auto Mat4::operator*(const Mat4& other) -> Mat4
 
 	return result;
 }
+auto Mat4::operator*(const Vec4& other) -> Vec4
+{
+	Vec4 result;
+	result.x = math::reduce(col1 * other.x);
+	result.y = math::reduce(col2 * other.y);
+	result.z = math::reduce(col3 * other.z);
+	result.w = math::reduce(col4 * other.w);
+	return result;
+}
 
 auto Mat4::Perspective(float fov, float aspectRatio, float near, float far)
 	-> Mat4
 {
 	Mat4 result;
+	float radian = (fov / 180.f) * std::numbers::pi;
 
-	float tanHalfFov = std::tan(fov / 2);
+	float tanHalfFov = std::tan(radian / 2);
 
 	result.col1.x = 1 / (aspectRatio * tanHalfFov);
 	result.col2.y = 1 / tanHalfFov;
@@ -128,7 +138,17 @@ auto Mat4::Perspective(float fov, float aspectRatio, float near, float far)
 	result.col3.w = -1;
 
 	result.col4.z = -(2 * far * near) / (far - near);
+	result.col4.w = 0;
+	return result;
+}
 
+auto Mat4::transpose() -> Mat4
+{
+	Mat4 result;
+	result.col1 = getRow(0);
+	result.col2 = getRow(1);
+	result.col3 = getRow(2);
+	result.col4 = getRow(3);
 	return result;
 }
 
